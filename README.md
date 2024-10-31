@@ -12,7 +12,7 @@ Postvel is a self-hosted solution that provides a personal email server environm
 1. **Generate DKIM Keys:**
     - Use the following commands to generate DKIM keys:
       ```bash
-      opendkim-genkey -t -s smtp -d yourdomain.com
+      opendkim-genkey -b 2048 -h rsa-sha256 -r -s smtp -d yourdomain.com -v
       ```
     - This will generate two files: `smtp.private` (your private key) and `smtp.txt` (contains the public key).
 
