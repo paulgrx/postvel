@@ -7,6 +7,7 @@ use App\Models\Message;
 use App\Models\Recipient;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
@@ -14,7 +15,7 @@ use Illuminate\Support\Str;
 
 class RecipientController extends Controller
 {
-    public function index($messageId, Request $request)
+    public function index($messageId, Request $request): Response|JsonResponse
     {
         $validator = Validator::make($request->all(), [
             'status' => ['in:created,delivered,failed'],
@@ -33,7 +34,6 @@ SELECT
         "id", id,
         "email", email,
         "status", status,
-        "debug", debug,
         "postfix_status", postfix_status,
         "postfix_response", postfix_response,
         "updated_at", updated_at
@@ -87,21 +87,22 @@ SQL;
             ];
         }
 
-        Recipient::insert($recipients);
-
         $delay = null;
         if ($request->delay) {
             $delay = Carbon::parse($request->delay);
         }
 
-        Send::dispatch($batchId)->onQueue('send')->delay($delay);
+        DB::transaction(function () use ($recipients, $batchId, $delay) {
+            Recipient::insert($recipients);
+            Send::dispatch($batchId)->onQueue('send')->delay($delay);
+        });
 
         return response()->json([
             'recipients' => $message->recipients()->where('batch_id', $batchId)->get()
         ], 200);
     }
 
-    public function progress($messageId)
+    public function progress($messageId): JsonResponse
     {
         $counts = Recipient::where('message_id', $messageId)
             ->selectRaw("SUM(CASE WHEN status = 'created' THEN 1 ELSE 0 END) as created_count, COUNT(*) as total_count")
