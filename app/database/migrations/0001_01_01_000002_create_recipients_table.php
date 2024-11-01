@@ -19,7 +19,10 @@ return new class extends Migration
             $table->string('status');
             $table->json('replacements');
             $table->text('debug')->nullable();
-            $table->string('postfix_id')->unique()->nullable();
+            $table->string('postfix_id')
+                ->unique()
+                ->collation('utf8mb4_bin')
+                ->nullable();
             $table->string('postfix_status')->nullable();
             $table->text('postfix_response')->nullable();
             $table->timestamps(6);
