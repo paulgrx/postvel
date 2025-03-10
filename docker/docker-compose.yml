@@ -58,6 +58,8 @@ services:
     image: mysql:9.1.0
     container_name: postvel_mysql
     restart: unless-stopped
+    ports:
+      - "23306:3306"
     environment:
       MYSQL_DATABASE: postvel
       MYSQL_ROOT_PASSWORD: secret
