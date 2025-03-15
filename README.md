@@ -29,7 +29,14 @@ Postvel is a self-hosted solution that provides a personal email server environm
         - **Type:** TXT
         - **Value:** `v=spf1 ip4:YOUR_BLOCK_IP_ADDRESS/30 -all`
 
-4. **Place the DKIM Private Key:**
+4. **Configure MX Record:**
+    - Add an MX record to your domain:
+        - **Name:** `@` or leave it empty if your DNS management tool suggests it
+        - **Type:** MX
+        - **Priority:** `10` or another value; lower numbers indicate higher priority
+        - **Value:** `mail.yourdomain.com`
+
+5. **Place the DKIM Private Key:**
     - Move the `smtp.private` file to the project as `./dkim/yourdomain.com.private` so that the server can access it for signing emails.
 
 ### Project Startup
